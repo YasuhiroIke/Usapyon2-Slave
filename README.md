@@ -15,13 +15,21 @@
 
 
   Usapyon2, a USI shogi(japanese-chess) playing engine derived from 
+
   Stockfish 7 & nanoha-mini 0.2.2.1
+
   Stockfish, a UCI chess playing engine derived from Glaurung 2.1
+
   Copyright (C) 2004-2008 Tord Romstad (Glaurung author)
+
   Copyright (C) 2008-2015 Marco Costalba, Joona Kiiski, Tord Romstad  (Stockfish author)
+
   Copyright (C) 2015-2016 Marco Costalba, Joona Kiiski, Gary Linscott, Tord Romstad  (Stockfish author)
+
   Copyright (C) 2014-2016 Kazuyuki Kawabata (nanoha-mini author)
+
   Copyright (C) 2015-2016 Yasuhiro Ike
+
 
   Usapyon2 is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
