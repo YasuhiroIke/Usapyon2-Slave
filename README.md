@@ -10,6 +10,8 @@
 元にしているソースコードは、「なのはmini 0.2.2.1」、「StockFish 7」になっております。
 また、評価バイナリは、Aperyの「大樹の枝バージョン」を使用しております。
 
+usapyon2.exeを実行する際には、Aperyの「大樹の枝バージョン」のxxx_synthesized.binを同じディレクトリに置いておく必要があります。
+
 「なのはmini」の作者、川端一之様、「Apery」の作者、平岡拓也様、
 「StockFish7」の作者、Tord Romstad様、Marco Costalba様, Joona Kiiski様,Gary Linscott様に深く感謝をしております。
 
