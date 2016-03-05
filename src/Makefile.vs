@@ -88,7 +88,7 @@ clean :
 
 pgo: $(OBJS)
 	$(LD) $(PGOLDFLAGS1) $(OBJS) User32.lib
-	$(EXE) bench 256 4 10
+	$(EXE) bench 256 1 9
 	pgomgr /merge $(PGD)
 	pgomgr /summary $(PGD) > $(PGOLOG)
 	$(LD) $(PGOLDFLAGS2) $(OBJS) User32.lib
