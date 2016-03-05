@@ -223,7 +223,7 @@ uint64_t Search::perft(Position& pos, Depth depth) {
 
 
 #if defined(NANOHA)
-  for (MoveList<MV_LEGAL> ml(pos); !ml.end(); ml++)
+  for (MoveList<MV_LEGAL> ml(pos); !ml.end(); ++ml)
 #else
   for (const auto& m : MoveList<LEGAL>(pos))
 #endif

@@ -190,7 +190,7 @@ void ThreadPool::start_thinking(const Position& pos, const LimitsType& limits,
       assert(!states.get());
   }
 #ifdef NANOHA
-  for (MoveList<MV_LEGAL> ml(pos); !ml.end(); ml++) {
+  for (MoveList<MV_LEGAL> ml(pos); !ml.end(); ++ml) {
 	  if (limits.searchmoves.empty()
 		  || std::count(limits.searchmoves.begin(), limits.searchmoves.end(), ml.move()))
 		  main()->rootMoves.push_back(RootMove(ml.move()));

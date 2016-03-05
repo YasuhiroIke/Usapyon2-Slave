@@ -264,7 +264,7 @@ const string move_to_uci(Move m, bool chess960) {
 Move move_from_uci(const Position& pos, const string& str) {
 
 #if defined(NANOHA)
-	for (MoveList<MV_LEGAL> ml(pos); !ml.end(); ml++)
+	for (MoveList<MV_LEGAL> ml(pos); !ml.end(); ++ml)
 		if (str == move_to_uci(ml.move()))
 			return ml.move();
 

@@ -295,10 +295,10 @@ std::ostream& operator<<(std::ostream& os, const Position& pos) {
 std::ostream& operator<<(std::ostream& os, const Position& pos) {
 	const char* dottedLine = "\n+---+---+---+---+---+---+---+---+---+\n";
 	os << dottedLine;
-	for (Rank rank = RANK_1; rank <= RANK_9; rank++)
+	for (Rank rank = RANK_1; rank <= RANK_9; ++rank)
 	{
 		os << dottedLine << '|';
-		for (File file = FILE_9; file >= FILE_1; file--)
+		for (File file = FILE_9; file >= FILE_1; --file)
 		{
 			Square sq = make_square(file, rank);
 			Piece piece = pos.piece_on(sq);
@@ -719,10 +719,10 @@ const string Position::fen() const {
 	Square sq;
 	int emptyCnt;
 
-	for (Rank rank = RANK_1; rank <= RANK_9; rank++)
+	for (Rank rank = RANK_1; rank <= RANK_9; ++rank)
 	{
 		emptyCnt = 0;
-		for (File file = FILE_9; file >= FILE_1; file--)
+		for (File file = FILE_9; file >= FILE_1; --file)
 		{
 			sq = make_square(file, rank);
 
@@ -1775,7 +1775,7 @@ bool Position::pos_is_ok(int* failedStep) const {
 	if (debugKingCount)
 	{
 		int kingCount[2] = { 0, 0 };
-		for (Square s = SQ_A1; s <= SQ_I9; s++)
+		for (Square s = SQ_A1; s <= SQ_I9; ++s)
 			if (type_of(piece_on(s)) == OU)
 				kingCount[color_of(piece_on(s))]++;
 
@@ -1911,10 +1911,10 @@ void Position::print_csa(Move move) const {
 		std::cout << "\nMove is: NONE" << std::endl;
 	}
 	// ”Õ–Ê
-	for (Rank rank = RANK_1; rank <= RANK_9; rank++)
+	for (Rank rank = RANK_1; rank <= RANK_9; ++rank)
 	{
 		std::cout << "P" << int(rank);
-		for (File file = FILE_9; file >= FILE_1; file--)
+		for (File file = FILE_9; file >= FILE_1; --file)
 		{
 			Square sq = make_square(file, rank);
 			Piece piece = piece_on(sq);
