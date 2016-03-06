@@ -64,8 +64,8 @@ struct RootMove {
 	  previousScore = -VALUE_INFINITE;
   }
 
-  bool operator<(const RootMove& m) const { return m.score < score; } // Descending sort
-  bool operator==(const Move& m) const { return pv[0] == m; }
+  inline bool operator<(const RootMove& m) const { return m.score < score; } // Descending sort
+  inline bool operator==(const Move& m) const { return pv[0] == m; }
   void insert_pv_in_tt(Position& pos);
   bool extract_ponder_from_tt(Position& pos);
 #ifndef NANOHA
