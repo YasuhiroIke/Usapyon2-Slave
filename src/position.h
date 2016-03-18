@@ -231,7 +231,9 @@ public:
   void do_null_move(StateInfo& st);
   void undo_null_move();
   // 手を進めずにハッシュ計算のみ行う
+#ifndef USAPYON2
   uint64_t calc_hash_no_move(const Move m) const;
+#endif
 #else
   // Doing and undoing moves
   void do_move(Move m, StateInfo& st, bool givesCheck);
@@ -533,6 +535,9 @@ private:
 	static Key zobrist[GRY+1][0x100];
 	static Key zobSideToMove;		// 手番を区別する
 	static Key zobExclusion;		// NULL MOVEかどうか区別する
+#ifdef USAPYON2
+	static Key zobHand[GRY + 1][32];
+#endif
 	static unsigned char DirTbl[0xA0][0x100];	// 方向用[from][to]
 
 	// 王手生成用テーブル

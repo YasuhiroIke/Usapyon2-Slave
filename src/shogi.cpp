@@ -48,6 +48,14 @@
 const uint32_t Hand::tbl[HI+1] = {
 	0, HAND_FU_INC, HAND_KY_INC, HAND_KE_INC, HAND_GI_INC, HAND_KI_INC, HAND_KA_INC, HAND_HI_INC, 
 };
+#ifdef USAPYON2
+const int Hand::SHIFTS[HI + 1] = {
+	0, HAND_FU_SHIFT,HAND_KY_SHIFT,HAND_KE_SHIFT,HAND_GI_SHIFT,HAND_KI_SHIFT,HAND_KA_SHIFT,HAND_HI_SHIFT
+};
+const int Hand::MASKS[HI + 1] = {
+	0,HAND_FU_MASK,HAND_KY_MASK,HAND_KE_MASK,HAND_GI_MASK,HAND_KI_MASK,HAND_KA_MASK,HAND_HI_MASK
+};
+#endif
 #if defined(ENABLE_MYASSERT)
 int debug_level;
 #endif
@@ -938,8 +946,19 @@ void Position::do_move(Move m, StateInfo& newSt)
 		kn = komano[to];
 		knkind[kn] = (capture ^ GOTE) & ~(PROMOTED);
 		knpos[kn] = (us == BLACK) ? 1 : 2;
-		if (us == BLACK) handS.inc(capture & ~(GOTE | PROMOTED));
-		else             handG.inc(capture & ~(GOTE | PROMOTED));
+		if (us == BLACK) {
+			int kind = capture & ~(GOTE | PROMOTED);
+			handS.inc(kind);
+#ifdef USAPYON2
+			key ^= zobHand[kind][handS.getFromKind(kind)];
+#endif
+		} else {
+			int kind = capture & ~(GOTE | PROMOTED);
+			handG.inc(kind);
+#ifdef USAPYON2
+			key ^= zobHand[kind|GOTE][handG.getFromKind(kind)];
+#endif
+		}
 
 #if !defined(TSUMESOLVER)
 		// material 更新
@@ -1185,12 +1204,18 @@ void Position::do_drop(Move m)
 	}
 
 	if (us == BLACK) {
+#ifdef USAPYON2
+		st->key ^= zobHand[piece][handS.getFromKind(piece & ~ GOTE)];
+#endif
 		handS.h -= diff;
 		while (kn <= kne) {
 			if (knpos[kn] == 1) break;
 			kn++;
 		}
 	} else {
+#ifdef USAPYON2
+		st->key ^= zobHand[piece][handG.getFromKind(piece & ~GOTE)];
+#endif
 		handG.h -= diff;
 		while (kn <= kne) {
 			if (knpos[kn] == 2) break;
@@ -1239,6 +1264,7 @@ void Position::do_drop(Move m)
 	sideToMove = flip(sideToMove);
 
 	assert(pos_is_ok());
+	assert(Position::key() == compute_key());
 }
 
 /// Position::undo_move() unmakes a move. When it returns, the position should
@@ -1437,8 +1463,11 @@ void Position::undo_move(Move m) {
 		komano[to] = kn;
 		add_effect(to);	// 取った駒の利きを追加
 
-		if (us == BLACK) handS.dec(captured & ~(GOTE | PROMOTED));
-		else             handG.dec(captured & ~(GOTE | PROMOTED));
+		if (us == BLACK) {
+			handS.dec(captured & ~(GOTE | PROMOTED));
+		} else {
+			handG.dec(captured & ~(GOTE | PROMOTED));
+		}
 	} else {
 		// 移動先は空→移動先の長い利きを通す
 		// 後手の利きを消す
@@ -1548,6 +1577,7 @@ void Position::undo_move(Move m) {
 	st = st->previous;
 
 	assert(pos_is_ok());
+	assert(Position::key() == compute_key());
 }
 
 void Position::undo_drop(Move m)
@@ -1671,8 +1701,12 @@ void Position::undo_drop(Move m)
 	st = st->previous;
 
 	assert(pos_is_ok());
+	assert(Position::key() == compute_key());
 }
 
+
+//　呼び出されていない？
+#ifndef USAPYON2
 // 手を進めずにハッシュ計算のみ行う
 uint64_t Position::calc_hash_no_move(const Move m) const
 {
@@ -1687,6 +1721,9 @@ uint64_t Position::calc_hash_no_move(const Move m) const
 	if (!move_is_drop(m)) {
 		// 空白になったことで変わるハッシュ値
 		new_key ^= zobrist[piece][from];
+	} else {
+		// 持ち駒の変化によるハッシュ
+		// 本来必要なハズだが、呼び出されていないのなら関係ない…。
 	}
 
 	// to の処理
@@ -1694,6 +1731,8 @@ uint64_t Position::calc_hash_no_move(const Move m) const
 	Piece capture = move_captured(m);
 	if (capture) {
 		new_key ^= zobrist[ban[to]][to];
+		// 持ち駒の変化によるハッシュ
+		// 本来必要なハズだが、呼び出されていないのなら関係ない…。
 	}
 
 	// 新しい駒をＨａｓｈに加える
@@ -1702,6 +1741,7 @@ uint64_t Position::calc_hash_no_move(const Move m) const
 
 	return new_key;
 }
+#endif
 
 // 指し手チェック系
 // 指し手が王手かどうかチェックする

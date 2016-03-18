@@ -498,6 +498,12 @@ struct Hand {
 	inline uint32_t getKI() const {return ((h & HAND_KI_MASK) >> HAND_KI_SHIFT);}
 	inline uint32_t getKA() const {return ((h & HAND_KA_MASK) >> HAND_KA_SHIFT);}
 	inline uint32_t getHI() const {return ((h & HAND_HI_MASK) >> HAND_HI_SHIFT);}
+#ifdef USAPYON2
+	static const int MASKS[HI + 1];
+	static const int SHIFTS[HI + 1];
+	inline uint32_t getFromKind(int kind) const{ return ((h&MASKS[kind]) >> SHIFTS[kind]); }
+#endif // USAPYON2
+
 	// 駒を持っているかどうか(存在を確認するだけならシフト演算は不要)
 	inline uint32_t existFU() const {return (h & HAND_FU_MASK);}
 	inline uint32_t existKY() const {return (h & HAND_KY_MASK);}

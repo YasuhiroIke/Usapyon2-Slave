@@ -136,6 +136,9 @@ namespace Zobrist {
 Key Position::zobrist[GRY + 1][0x100];
 Key Position::zobSideToMove;	// Žè”Ô‚ð‹æ•Ê‚·‚é
 Key Position::zobExclusion;		// NULL MOVE‚©‚Ç‚¤‚©‹æ•Ê‚·‚é
+#ifdef USAPYON2
+Key Position::zobHand[GRY + 1][32];
+#endif
 #endif
 
 Key Position::exclusion_key() const { return st->key ^ zobExclusion; }
@@ -324,6 +327,10 @@ void Position::init() {
   int j, k;
   for (j = 0; j < GRY + 1; j++) for (k = 0; k < 0x100; k++)
 	  zobrist[j][k] = rng.rand<Key>() << 1;
+#ifdef USAPYON2
+  for (j = 0; j < GRY + 1; j++) for (k = 0; k < 32; k++)
+	  zobHand[j][k] = rng.rand<Key>() << 1;
+#endif
 #else
   for (Color c = WHITE; c <= BLACK; ++c)
       for (PieceType pt = PAWN; pt <= KING; ++pt)
@@ -660,6 +667,53 @@ Key Position::compute_key() const {
 			}
 		}
 	}
+
+#ifdef USAPYON2
+	for (int i = 1; i <= hand[BLACK].getFU(); i++) {
+		k ^= zobHand[FU][i];
+	}
+	for (int i = 1; i <= hand[BLACK].getKY(); i++) {
+		k ^= zobHand[KY][i];
+	}
+	for (int i = 1; i <= hand[BLACK].getKE(); i++) {
+		k ^= zobHand[KE][i];
+	}
+	for (int i = 1; i <= hand[BLACK].getGI(); i++) {
+		k ^= zobHand[GI][i];
+	}
+	for (int i = 1; i <= hand[BLACK].getKI(); i++) {
+		k ^= zobHand[KI][i];
+	}
+	for (int i = 1; i <= hand[BLACK].getKA(); i++) {
+		k ^= zobHand[KA][i];
+	}
+	for (int i = 1; i <= hand[BLACK].getHI(); i++) {
+		k ^= zobHand[HI][i];
+	}
+
+	for (int i = 1; i <= hand[WHITE].getFU(); i++) {
+		k ^= zobHand[GFU][i];
+	}
+	for (int i = 1; i <= hand[WHITE].getKY(); i++) {
+		k ^= zobHand[GKY][i];
+	}
+	for (int i = 1; i <= hand[WHITE].getKE(); i++) {
+		k ^= zobHand[GKE][i];
+	}
+	for (int i = 1; i <= hand[WHITE].getGI(); i++) {
+		k ^= zobHand[GGI][i];
+	}
+	for (int i = 1; i <= hand[WHITE].getKI(); i++) {
+		k ^= zobHand[GKI][i];
+	}
+	for (int i = 1; i <= hand[WHITE].getKA(); i++) {
+		k ^= zobHand[GKA][i];
+	}
+	for (int i = 1; i <= hand[WHITE].getHI(); i++) {
+		k ^= zobHand[GHI][i];
+	}
+#endif
+
 	if (side_to_move() != BLACK)
 		k ^= zobSideToMove;
 

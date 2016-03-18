@@ -39,9 +39,9 @@
 /// bound type  2 bit
 /// depth       8 bit
 #else
-/// TTEntry struct is the 12 bytes transposition table entry, defined as below:
+/// TTEntry struct is the 14 bytes transposition table entry, defined as below:
 ///
-/// key        16 bit
+/// key        32 bit
 /// move       32 bit
 /// value      16 bit
 /// eval value 16 bit
@@ -50,6 +50,7 @@
 /// depth       8 bit
 #endif
 
+#pragma pack(1)
 struct TTEntry {
 
   Move  move()  const { return (Move )move32; }
@@ -61,16 +62,16 @@ struct TTEntry {
   void save(Key k, Value v, Bound b, Depth d, Move m, Value ev, uint8_t g) {
 
     // Preserve any existing move for the same position
-    if (m || (k >> 48) != key16)
+    if (m || (k >> 32) != key32)
         move32 = (uint32_t)m;
 
     // Don't overwrite more valuable entries
-    if (  (k >> 48) != key16
+    if (  (k >> 32) != key32
         || d > depth8 - 2
      /* || g != (genBound8 & 0xFC) // Matching non-zero keys are already refreshed by probe() */
         || b == BOUND_EXACT)
     {
-        key16     = (uint16_t)(k >> 48);
+        key32     = (uint32_t)(k >> 32);
         value16   = (int16_t)v;
         eval16    = (int16_t)ev;
         genBound8 = (uint8_t)(g | b);
@@ -81,14 +82,14 @@ struct TTEntry {
 private:
   friend class TranspositionTable;
 
+  uint32_t key32;
   uint32_t move32;
-  uint16_t key16;
   int16_t  value16;
   int16_t  eval16;
   uint8_t  genBound8;
   int8_t   depth8;
 };
-
+#pragma pack()
 
 /// A TranspositionTable consists of a power of 2 number of clusters and each
 /// cluster consists of ClusterSize number of TTEntry. Each non-empty entry
@@ -100,14 +101,14 @@ private:
 class TranspositionTable {
 
   static const int CacheLineSize = 64;
-  static const int ClusterSize = 5;
+  static const int ClusterSize = 4;
 
   struct Cluster {
     TTEntry entry[ClusterSize];
-    char padding[4]; // Align to a divisor of the cache line size
+    char padding[8]; // Align to a divisor of the cache line size
   };
 
-  static_assert(sizeof(TTEntry)==12,"TTEntry size !=12");
+  static_assert(sizeof(TTEntry)==14,"TTEntry size !=14");
   static_assert(CacheLineSize % sizeof(Cluster) == 0, "Cluster size incorrect");
 
 public:
