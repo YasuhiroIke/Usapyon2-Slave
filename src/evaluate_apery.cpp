@@ -138,6 +138,21 @@ namespace {
 }
 
 #ifdef TWIG
+template <typename Tl, typename Tr>
+inline std::array<Tl, 2> operator += (std::array<Tl, 2>& lhs, const std::array<Tr, 2>& rhs) {
+	lhs[0] += rhs[0];
+	lhs[1] += rhs[1];
+	return lhs;
+}
+template <typename Tl, typename Tr>
+inline std::array<Tl, 2> operator -= (std::array<Tl, 2>& lhs, const std::array<Tr, 2>& rhs) {
+	lhs[0] -= rhs[0];
+	lhs[1] -= rhs[1];
+	return lhs;
+}
+#endif
+
+#ifdef TWIG
 struct EvalSum {
 #if defined USE_AVX2_EVAL
 	EvalSum(const EvalSum& es) {
@@ -519,6 +534,49 @@ int Position::evaluate(const Color us) const
 
 	return score;
 #else
+	EvalSum sum;
+	sum.p[2] = KK[sq_bk][sq_wk];
+#if defined USE_AVX2_EVAL || defined USE_SSE_EVAL
+	sum.m[0] = _mm_setzero_si128();
+	for (int i = 0; i < nlist; ++i) {
+		const int k0 = list0[i];
+		const int k1 = list1[i];
+		const auto* pkppb = ppkppb[k0];
+		const auto* pkppw = ppkppw[k1];
+		for (int j = 0; j < i; ++j) {
+			const int l0 = list0[j];
+			const int l1 = list1[j];
+			__m128i tmp;
+			tmp = _mm_set_epi32(0, 0, *reinterpret_cast<const int32_t*>(&pkppw[l1][0]), *reinterpret_cast<const int32_t*>(&pkppb[l0][0]));
+			tmp = _mm_cvtepi16_epi32(tmp);
+			sum.m[0] = _mm_add_epi32(sum.m[0], tmp);
+		}
+		sum.p[2] += KKP[sq_bk][sq_wk][k0];
+	}
+	sum.p[2][0] += MATERIAL * FV_SCALE;
+
+#else
+	// loop 開始を i = 1 からにして、i = 0 の分のKKPを先に足す。
+	sum.p[2] += KKP[sq_bk][sq_wk][list0[0]];
+	sum.p[0][0] = 0;
+	sum.p[0][1] = 0;
+	sum.p[1][0] = 0;
+	sum.p[1][1] = 0;
+	for (int i = 1; i < nlist; ++i) {
+		const int k0 = list0[i];
+		const int k1 = list1[i];
+		const auto* pkppb = ppkppb[k0];
+		const auto* pkppw = ppkppw[k1];
+		for (int j = 0; j < i; ++j) {
+			const int l0 = list0[j];
+			const int l1 = list1[j];
+			sum.p[0] += pkppb[l0];
+			sum.p[1] += pkppw[l1];
+		}
+		sum.p[2] += KKP[sq_bk][sq_wk][k0];
+	}
+#endif
+
 	score.p[2] = KK[sq_bk][sq_wk];
 
 	score.p[0][0] = 0;
@@ -544,6 +602,8 @@ int Position::evaluate(const Color us) const
 	}
 
 	score.p[2][0] += MATERIAL * FV_SCALE;
+
+	assert(score.sum(us) == sum.sum(us));
 
 	return score.sum(us) / FV_SCALE ;
 

@@ -46,6 +46,9 @@ LD=link
 # -DEVAL_NANO      なのはnano(2駒関係(KPのみ)の評価関数)
 # -DEVAL_APERY     nanopery(Aperyの評価関数)
 #
+# -DTWIG           Apery(大樹の枝)の評価関数を使う
+# -DUSE_AVX2_EVAL  評価関数の計算時にAVX命令を使う
+#
 # Visual C++オプション
 #
 # /D_CRT_SECURE_NO_WARNINGS
@@ -58,7 +61,7 @@ LD=link
 # /RTCs             スタック フレーム ランタイム チェック
 # /RTCu             初期化されていないローカル変数のチェック
 
-FLAGS = -DNDEBUG -D$(EVAL_TYPE) -DUSAPYON2 -DNANOHA -DCHK_PERFORM -DTWIG \
+FLAGS = -DNDEBUG -D$(EVAL_TYPE) -DUSAPYON2 -DNANOHA -DCHK_PERFORM -DTWIG -DUSE_AVX2_EVAL \
 	-DOLD_LOCKS /favor:AMD64 /EHsc /D_CRT_SECURE_NO_WARNINGS \
 	 /GL /Zc:forScope
 #CXXFLAGS=$(FLAGS) /MT /W4 /Wall /nologo /Od /GS /RTCsu

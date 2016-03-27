@@ -45,6 +45,10 @@
 #include "book.h"
 #endif
 
+#ifdef NANOHA
+#define QSEARCH_MATE3
+#endif
+
 namespace Search {
 
   SignalsType Signals;

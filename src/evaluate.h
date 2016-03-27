@@ -37,6 +37,10 @@ Value evaluate(const Position& pos, Value& margin);
 namespace Eval {
 	const Value Tempo = Value(20); // Must be visible to search
 }
+#if defined(NANOHA) && (USE_AVX2_EVAL) && (TWIG)
+#include <emmintrin.h>
+#include <smmintrin.h>
+#endif
 
 Value evaluate(const Position& pos);
 #endif
