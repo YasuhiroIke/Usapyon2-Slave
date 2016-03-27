@@ -577,6 +577,7 @@ int Position::evaluate(const Color us) const
 	}
 #endif
 
+#ifdef _DEBUG
 	score.p[2] = KK[sq_bk][sq_wk];
 
 	score.p[0][0] = 0;
@@ -602,10 +603,10 @@ int Position::evaluate(const Color us) const
 	}
 
 	score.p[2][0] += MATERIAL * FV_SCALE;
-
 	assert(score.sum(us) == sum.sum(us));
+#endif
 
-	return score.sum(us) / FV_SCALE ;
+	return sum.sum(us) / FV_SCALE ;
 
 #endif
 }
