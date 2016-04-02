@@ -74,7 +74,11 @@ namespace {
         fen = StartFEN;
         is >> token; // Consume "moves" token if any
     }
-    else if (token == "fen")
+#ifdef NANOHA
+	else if (token == "sfen")
+#else
+	else if (token == "fen")
+#endif
         while (is >> token && token != "moves")
             fen += token + " ";
     else
