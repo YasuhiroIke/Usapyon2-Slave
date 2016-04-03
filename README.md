@@ -12,7 +12,11 @@
 
 usapyon2.exeを実行する際には、Aperyの「大樹の枝バージョン」のxxx_synthesized.binを同じディレクトリに置いておく必要があります。
 
+また、定跡を使用する場合には、book_40.jskというファイルも必要です。
+
 <strike>binディレクトリにbin.zipを置きましたので、そちらを解凍してusapyon2.exeと同じディレクトリに置けばＯＫです。</strike>
+
+定跡ファイルも以下の場所からダウンロード可能にしました。
 
 上記、転送容量の制限にひっかかってしまったようですので、<a href="http://usapyon.game.coocan.jp/usapyon2/index.html">うさぴょん２</a>のページからダウンロードして下さい。
 
