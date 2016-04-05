@@ -61,7 +61,7 @@ LD=link
 # /RTCs             スタック フレーム ランタイム チェック
 # /RTCu             初期化されていないローカル変数のチェック
 
-FLAGS = -DNDEBUG -D$(EVAL_TYPE) -DUSAPYON2 -DNANOHA -DCHK_PERFORM -DTWIG -DUSE_AVX2_EVAL \
+FLAGS = -DNDEBUG -D$(EVAL_TYPE) -DUSAPYON2 -DNANOHA -DCHK_PERFORM -DTWIG \
 	-DOLD_LOCKS /favor:AMD64 /EHsc /D_CRT_SECURE_NO_WARNINGS \
 	 /GL /Zc:forScope
 #CXXFLAGS=$(FLAGS) /MT /W4 /Wall /nologo /Od /GS /RTCsu

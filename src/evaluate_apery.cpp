@@ -575,6 +575,7 @@ int Position::evaluate(const Color us) const
 		}
 		sum.p[2] += KKP[sq_bk][sq_wk][k0];
 	}
+	sum.p[2][0] += MATERIAL * FV_SCALE;
 #endif
 
 #ifdef _DEBUG
