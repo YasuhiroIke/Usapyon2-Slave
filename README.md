@@ -24,6 +24,9 @@ usapyon2.exeを実行する際には、Aperyの「大樹の枝バージョン」
 「StockFish7」の作者、Tord Romstad様、Marco Costalba様, Joona Kiiski様,Gary Linscott様に深く感謝をしております。
 
 
+また、２ｃｈの「コンピュータ将棋スレッド」での「名無し名人」様方にも深く感謝をしております。
+
+
   Usapyon2, a USI shogi(japanese-chess) playing engine derived from 
 
   Stockfish 7 & nanoha-mini 0.2.2.1
