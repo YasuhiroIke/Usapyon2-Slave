@@ -24,7 +24,7 @@ EVAL_TYPE=EVAL_APERY
 EVAL_OBJ=evaluate_apery.obj
 EXE = usapyon2AVX.exe
 PGD = usapyon2AVX.pgd
-PGOLOG = usapyon2_profAVX.txt
+PGOLOG = usapyon2AVX_prof.txt
 !ELSE
 !ERROR undefined eval_type
 !ENDIF
