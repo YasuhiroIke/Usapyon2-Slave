@@ -122,7 +122,7 @@ const int MAX_MOVES = 768;
 #else
 const int MAX_MOVES = 256;
 #endif
-const int MAX_PLY   = 128;
+const int MAX_PLY   = 64;
 
 #ifndef PRI64
 #define PRI64	"%lld"
@@ -706,7 +706,7 @@ inline Value mated_in(int ply) {
 
 #ifdef NANOHA
 inline Square make_square(File f, Rank r) {
-  return Square((r << 4) | f);
+  return Square((f << 4) | r);
 }
 #else
 inline Square make_square(File f, Rank r) {

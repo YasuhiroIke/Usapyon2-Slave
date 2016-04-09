@@ -699,6 +699,7 @@ namespace {
     moveCount = quietCount =  ss->moveCount = 0;
     bestValue = -VALUE_INFINITE;
     ss->ply = (ss-1)->ply + 1;
+	ss->checkmateTested = false;
 
     // Check for available remaining time
     if (thisThread->resetCalls.load(std::memory_order_relaxed))
@@ -987,8 +988,14 @@ moves_loop: // When in check search starts from here
 		// NULLMOVEと思われるが、pos.piece_on(0)はWALLになるので都合が悪い
 		prevSq = (Square)0x11;
 	}
-    Move cm = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
-    const CounterMovesStats& cmh = CounterMovesHistory[pos.piece_on(prevSq)][prevSq];
+#ifdef USAPYON2
+	Move cm = thisThread->counterMoves[move_piece((ss-1)->currentMove)][prevSq];
+	const CounterMovesStats& cmh = CounterMovesHistory[move_piece((ss - 1)->currentMove)][prevSq];
+#else
+	Move cm = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
+	const CounterMovesStats& cmh = CounterMovesHistory[pos.piece_on(prevSq)][prevSq];
+#endif // USAPYON2
+
 
     MovePicker mp(pos, ttMove, depth, thisThread->history, cmh, cm, ss);
 //    CheckInfo ci(pos);
@@ -1149,13 +1156,27 @@ moves_loop: // When in check search starts from here
 
           // Increase reduction for cut nodes and moves with a bad history
           if (   (!PvNode && cutNode)
-              || (   thisThread->history[pos.piece_on(to_sq(move))][to_sq(move)] < VALUE_ZERO
-                  && cmh[pos.piece_on(to_sq(move))][to_sq(move)] <= VALUE_ZERO))
+#ifdef USAPYON2
+			  || (thisThread->history[move_piece(move)][to_sq(move)] < VALUE_ZERO
+				  && cmh[move_piece(move)][to_sq(move)] <= VALUE_ZERO))
+
+#else
+			  || (thisThread->history[pos.piece_on(to_sq(move))][to_sq(move)] < VALUE_ZERO
+				  && cmh[pos.piece_on(to_sq(move))][to_sq(move)] <= VALUE_ZERO))
+#endif // USAPYON2
+
               r += ONE_PLY;
 
           // Decrease reduction for moves with a good history
-          if (   thisThread->history[pos.piece_on(to_sq(move))][to_sq(move)] > VALUE_ZERO
-              && cmh[pos.piece_on(to_sq(move))][to_sq(move)] > VALUE_ZERO)
+
+          if (
+#ifdef USAPYON2
+			  thisThread->history[move_piece(move)][to_sq(move)] > VALUE_ZERO
+			  && cmh[move_piece(move)][to_sq(move)] > VALUE_ZERO)
+#else
+			  thisThread->history[pos.piece_on(to_sq(move))][to_sq(move)] > VALUE_ZERO
+			  && cmh[pos.piece_on(to_sq(move))][to_sq(move)] > VALUE_ZERO)
+#endif
               r = std::max(DEPTH_ZERO, r - ONE_PLY);
 
           // Decrease reduction for moves that escape a capture
@@ -1307,11 +1328,22 @@ moves_loop: // When in check search starts from here
     {
         Value bonus = Value((depth / ONE_PLY) * (depth / ONE_PLY) + depth / ONE_PLY - 1);
         Square prevPrevSq = to_sq((ss - 2)->currentMove);
+#ifdef USAPYON2
+		if ((ss - 2)->currentMove != MOVE_NULL) {
+#else
 		if (prevPrevSq < 0x11) {
 			prevPrevSq = (Square)0x11;
 		}
-        CounterMovesStats& prevCmh = CounterMovesHistory[pos.piece_on(prevPrevSq)][prevPrevSq];
-        prevCmh.update(pos.piece_on(prevSq), prevSq, bonus);
+#endif
+
+#ifdef USAPYON2
+		CounterMovesStats& prevCmh = CounterMovesHistory[move_piece((ss - 2)->currentMove)][prevPrevSq];
+		prevCmh.update(pos.piece_on(prevSq), prevSq, bonus);
+		}
+#else
+		CounterMovesStats& prevCmh = CounterMovesHistory[pos.piece_on(prevPrevSq)][prevPrevSq];
+		prevCmh.update(pos.piece_on(prevSq), prevSq, bonus);
+#endif
     }
 
     tte->save(posKey, value_to_tt(bestValue, ss->ply),
@@ -1669,15 +1701,28 @@ moves_loop: // When in check search starts from here
 		// NULLMOVEとか、駒打ちとか…
 		prevSq = (Square)0x11;
 	}
-    CounterMovesStats& cmh = CounterMovesHistory[pos.piece_on(prevSq)][prevSq];
+#ifdef USAPYON2
+	CounterMovesStats& cmh = CounterMovesHistory[move_piece((ss-1)->currentMove)][prevSq];
+#else
+	CounterMovesStats& cmh = CounterMovesHistory[pos.piece_on(prevSq)][prevSq];
+#endif
     Thread* thisThread = pos.this_thread();
 
     thisThread->history.update(pos.moved_piece(move), to_sq(move), bonus);
 
-    if (is_ok((ss-1)->currentMove))
+    if (is_ok((ss-1)->currentMove)
+#ifdef USAPYON2
+		&& (ss-1)->currentMove!=MOVE_NULL
+#endif		
+		)
     {
-        thisThread->counterMoves.update(pos.piece_on(prevSq), prevSq, move);
-        cmh.update(pos.moved_piece(move), to_sq(move), bonus);
+#ifdef USAPYON2
+        thisThread->counterMoves.update(move_piece((ss - 1)->currentMove), prevSq, move);
+        cmh.update(move_piece((ss - 1)->currentMove), to_sq(move), bonus);
+#else
+		thisThread->counterMoves.update(pos.piece_on(prevSq), prevSq, move);
+		cmh.update(pos.moved_piece(move), to_sq(move), bonus);
+#endif
     }
 
     // Decrease all the other played quiet moves

@@ -1585,7 +1585,7 @@ Value Position::see(Move m) const {
 		if (id < 16) {
 			int z = to - NanohaTbl::Direction[id];
 			if (from != z) attacker[natk++] = ban[z] & ~GOTE;
-			if (dKiki[z] & (0x100u << id)) {
+			if (aKiki[z] & (0x100u << id)) {
 				z = SkipOverEMP(to, -NanohaTbl::Direction[id]);
 				attacker[natk++] = ban[z] & ~GOTE;
 			}
@@ -1593,7 +1593,7 @@ Value Position::see(Move m) const {
 		else {
 			int z = SkipOverEMP(to, -NanohaTbl::Direction[id]);
 			if (from != z) attacker[natk++] = ban[z] & ~GOTE;
-			if (dKiki[z] & (0x1u << id)) {
+			if (aKiki[z] & (0x1u << id)) {
 				z = SkipOverEMP(to, -NanohaTbl::Direction[id]);
 				attacker[natk++] = ban[z] & ~GOTE;
 			}
@@ -1723,7 +1723,8 @@ bool Position::is_draw(int& ret) const {
 			if (stp->key == st->key && stp->hand == st->hand) {
 				rept++;
 				// ‰ß‹Ž‚É3‰ñ(Œ»‹Ç–ÊŠÜ‚ß‚Ä4‰ñ)oŒ»‚µ‚Ä‚¢‚½‚çç“úŽè.
-				if (rept >= 3) {
+				// @¨Œ»‹Ç–ÊŠÜ‚ß‚Ä2‰ñ‚Åç“úŽè
+				if (rept >= 1) {
 					if (cont_checking) { ret = 1; return false; }
 					if (cont_checked) { ret = -1; return false; }
 					return true;
