@@ -11,3 +11,9 @@ usapyon2AVX.exe
 なお、将棋所でしか動作検証していませんし、将棋所へのエンジン登録時には、立ち上がりが遅いので、
 USIエンジンではありません、とか言われることがあります。
 
+また、
+
+http://usapyon.game.coocan.jp/usapyon2/index.html
+
+から、評価関数バイナリと定跡ファイルをダウンロードして、xxx_synthesized.bin及びbook_40.jskを
+exeと同じディレクトリに置かないと正常に動きませんので、よろしくお願いいたします。
