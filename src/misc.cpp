@@ -37,9 +37,9 @@ namespace {
 /// Version number. If Version is left empty, then compile date in the format
 /// DD-MM-YY and show in engine_info.
 #ifndef USE_AVX2_EVAL
-const string Version = "Beta3 No SSE|AVX";
+const string Version = "Beta3.1 No SSE|AVX";
 #else
-	const string Version = "Beta3 AVX";
+const string Version = "Beta3.1 AVX";
 #endif
 
 /// Our fancy logging facility. The trick here is to replace cin.rdbuf() and

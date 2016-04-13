@@ -1555,8 +1555,8 @@ Value Position::see(Move m) const {
 		if (id < 16) {
 			int z = to - NanohaTbl::Direction[id];
 			defender[ndef++] = ban[z] & ~GOTE;
-			if (dKiki[z] & (0x100u << id)) {
-				z = SkipOverEMP(to, -NanohaTbl::Direction[id]);
+			if (dKiki[z] & (0x10000u << id)) {
+				z = SkipOverEMP(z, -NanohaTbl::Direction[id]);
 				defender[ndef++] = ban[z] & ~GOTE;
 			}
 		}
@@ -1585,8 +1585,8 @@ Value Position::see(Move m) const {
 		if (id < 16) {
 			int z = to - NanohaTbl::Direction[id];
 			if (from != z) attacker[natk++] = ban[z] & ~GOTE;
-			if (aKiki[z] & (0x100u << id)) {
-				z = SkipOverEMP(to, -NanohaTbl::Direction[id]);
+			if (aKiki[z] & (0x10000u << id)) {
+				z = SkipOverEMP(z, -NanohaTbl::Direction[id]);
 				attacker[natk++] = ban[z] & ~GOTE;
 			}
 		}

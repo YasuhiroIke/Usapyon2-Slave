@@ -792,7 +792,7 @@ void Position::del_effect(const int z, const Piece kind)
 /// to a StateInfo object. The move is assumed to be legal. Pseudo-legal
 /// moves should be filtered out before this function is called.
 
-void Position::do_move(Move m, StateInfo& newSt)
+void Position::do_move(Move m, StateInfo& newSt,int count)
 {
 #ifdef NANOHA
 	assert(pos_is_ok());
@@ -806,7 +806,7 @@ void Position::do_move(Move m, StateInfo& newSt)
 	assert(m != MOVE_NULL);	// NullMove‚Ído_null_move()‚Åˆ—‚·‚é
 #endif
 
-	nodes++;
+	nodes+=count;
 	Key key = st->key;
 
 	// Copy some fields of old state to our new StateInfo object except the

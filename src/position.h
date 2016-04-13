@@ -224,7 +224,7 @@ public:
 #endif
 
 #ifdef NANOHA
-  void do_move(Move m, StateInfo& st);
+  void do_move(Move m, StateInfo& st,int count=1);
   void do_drop(Move m);
   void undo_move(Move m);
   void undo_drop(Move m);

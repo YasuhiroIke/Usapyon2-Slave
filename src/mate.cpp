@@ -1810,7 +1810,7 @@ int Position::Mate3(const Color us, Move &m)
 		Move move = cur->move;
 		// 残り３手では打ち歩詰めを回避する必要はないため、不成は読まない
 		if ((move & MOVE_CHECK_NARAZU)) continue;
-		do_move(move, newSt);
+		do_move(move, newSt,0);
 		int val;
 #if defined(DEBUG_MATE2)
 		pre_check = move;
@@ -1872,7 +1872,7 @@ int Position::EvasionRest2(const Color us, MoveStack *antichecks)
 	Move m;
 	for (cur = antichecks; cur != last; cur++) {
 		Move move = cur->move;
-		do_move(move, newSt);
+		do_move(move, newSt,0);
 		int val = (us == BLACK) ? Mate1ply<WHITE>(m, refInfo) :  Mate1ply<BLACK>(m, refInfo);
 		undo_move(move);
 
@@ -1892,7 +1892,7 @@ int Position::EvasionRest2(const Color us, MoveStack *antichecks)
 
 	for (cur = antichecks; cur != last; cur++) {
 		Move move = cur->move;
-		do_move(move, newSt);
+		do_move(move, newSt,0);
 		int val = (us == BLACK) ? Mate1ply<WHITE>(m, refInfo) : Mate1ply<BLACK>(m, refInfo);
 		undo_move(move);
 		if (val < valmin) {
@@ -1914,7 +1914,7 @@ int Position::EvasionRest2(const Color us, MoveStack *antichecks)
 		Move move = cur->move;
 
 		// 末端の詰み処理
-		do_move(move, newSt);
+		do_move(move, newSt,0);
 		int val = (us == BLACK) ? Mate1ply<WHITE>(m, refInfo) : Mate1ply<BLACK>(m, refInfo);
 		undo_move(move);
 
