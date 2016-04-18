@@ -1463,17 +1463,72 @@ Key Position::key_after(Move m) const {
 	Color us = sideToMove;
 	Square from = from_sq(m);
 	Square to = to_sq(m);
-	Piece pt = piece_on(from);
 	Piece captured = piece_on(to);
-
+	Piece piece = move_piece(m);
 
 	Key k = st->key ^ zobSideToMove;
 
-	if (captured != EMP) {
-		k ^= zobrist[captured][to];
+	// dropの場合・zobHand分更新/盤面[to]のみ更新すれば良い
+	if (move_is_drop(m)) {
+		if (us == BLACK) {
+#ifdef USAPYON2
+			k ^= zobHand[piece][handS.getFromKind(piece & ~GOTE)];
+			k ^= zobrist[piece][to];
+#endif
+		} else {
+#ifdef USAPYON2
+			k ^= zobHand[piece][handG.getFromKind(piece & ~GOTE)];
+			k ^= zobrist[piece][to];
+#endif
+		}
+#ifdef _DEBUG
+		Position p(*this);
+		StateInfo st_test(*st);
+		p.do_move(m,st_test,0);
+		assert(k == p.compute_key());
+#endif
+		return k;
 	}
 
-	return k ^ zobrist[pt][to] ^ zobrist[pt][from];
+	// capturedがある場合、まずcaptureした駒を取り除く
+	// さらに、持ち駒に追加するので、zobHandの更新が必要
+	if (captured != EMP) {
+		k ^= zobrist[captured][to];
+		int kind = captured & ~(GOTE | PROMOTED);
+#ifdef USAPYON2
+		if (us==BLACK) {
+			k^= zobHand[kind][handS.getFromKind(kind)+1];
+		} else {
+			k^= zobHand[kind | GOTE][handG.getFromKind(kind)+1];
+		}
+#endif
+	}
+
+	// dropではないので、元の位置の駒を取り除く
+	k ^= zobrist[piece][from];
+
+	// 成・不成に応じてzobrist[駒種][to]を更新
+	bool pm = is_promotion(m);
+	if (pm) {
+		k ^= zobrist[piece | PROMOTED][to];
+#ifdef _DEBUG
+		Position p(*this);
+		StateInfo st_test(*st);
+		p.do_move(m, st_test, 0);
+		assert(st_test.key == p.compute_key());
+		assert(k == p.compute_key());
+#endif
+	} else {
+		k ^= zobrist[piece][to];
+#ifdef _DEBUG
+		Position p(*this);
+		StateInfo st_test(*st);
+		p.do_move(m, st_test, 0);
+		assert(st_test.key == p.compute_key());
+		assert(k == p.compute_key());
+#endif
+	}
+	return k;
 }
 #else
 Key Position::key_after(Move m) const {

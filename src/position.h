@@ -113,7 +113,9 @@ public:
 #else
   Position() {}
 private:
-  Position(const Position&);
+	Position(const Position& old) {
+		memcpy(this,&old,sizeof(Position));
+	};
 public:
 #endif
   Position(const Position& pos, Thread* th) { *this = pos; thisThread = th; }
