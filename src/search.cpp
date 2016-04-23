@@ -1939,14 +1939,15 @@ bool RootMove::extract_ponder_from_tt(Position& pos)
 #endif // !NANOHA
 
     TTEntry* tte = TT.probe(pos.key(), ttHit);
-    pos.undo_move(pv[0]);
 
     if (ttHit)
     {
         Move m = tte->move(); // Local copy to be SMP safe
-        if (MoveList<MV_LEGAL>(pos).contains(m))
-           return pv.push_back(m), true;
+        if (MoveList<MV_LEGAL>(pos).contains(m)) {
+			pos.undo_move(pv[0]);
+			return pv.push_back(m), true;
+		}
     }
-
+    pos.undo_move(pv[0]);
     return false;
 }
