@@ -960,7 +960,7 @@ namespace {
 
 		while ((move = mp.next_move()) != MOVE_NONE) {
 #ifdef USAPYON2
-			if (ss->ply == 0) {
+			if (ss->ply == 1) {
 				// ルートなのでignoreMovesをチェック
 				if (isIgnoreMove(move)) {
 					continue;
