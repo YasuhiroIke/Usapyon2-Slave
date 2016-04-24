@@ -17,3 +17,5 @@ http://usapyon.game.coocan.jp/usapyon2/index.html
 
 から、評価関数バイナリと定跡ファイルをダウンロードして、xxx_synthesized.bin及びbook_40.jskを
 exeと同じディレクトリに置かないと正常に動きませんので、よろしくお願いいたします。
+
+今後、book_40_2.jskも必要になる予定です。
