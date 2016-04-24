@@ -70,6 +70,10 @@ namespace Tablebases {
 namespace TB = Tablebases;
 #endif
 
+#ifdef USAPYON2
+extern bool isIgnoreMove(Move m);
+#endif
+
 using std::string;
 #ifndef NANOHA
 using Eval::evaluate;
@@ -954,17 +958,26 @@ namespace {
         MovePicker mp(pos, ttMove, thisThread->history, PieceValueMidgame[pos.captured_piece_type()]);
 //        CheckInfo ci(pos);
 
-        while ((move = mp.next_move()) != MOVE_NONE)
-            if (pos.legal(move))
-            {
-                ss->currentMove = move;
-//              pos.do_move(move, st, pos.gives_check(move, ci));
-                pos.do_move(move, st);
-				value = -search<NonPV>(pos, ss+1, -rbeta, -rbeta+1, rdepth, !cutNode);
-                pos.undo_move(move);
-                if (value >= rbeta)
-                    return value;
-            }
+		while ((move = mp.next_move()) != MOVE_NONE) {
+#ifdef USAPYON2
+			if (ss->ply == 0) {
+				// ルートなのでignoreMovesをチェック
+				if (isIgnoreMove(move)) {
+					continue;
+				}
+			}
+#endif
+			if (pos.legal(move))
+			{
+				ss->currentMove = move;
+				// pos.do_move(move, st, pos.gives_check(move, ci));
+				pos.do_move(move, st);
+				value = -search<NonPV>(pos, ss + 1, -rbeta, -rbeta + 1, rdepth, !cutNode);
+				pos.undo_move(move);
+				if (value >= rbeta)
+					return value;
+			}
+		}
     }
 
     // Step 10. Internal iterative deepening (skipped when in check)
@@ -1018,6 +1031,15 @@ moves_loop: // When in check search starts from here
     while ((move = mp.next_move()) != MOVE_NONE)
     {
       assert(is_ok(move));
+#ifdef USAPYON2
+	  if (ss->ply==1) {
+		  // ルートなのでignoreMovesをチェック
+		  if (isIgnoreMove(move)) {
+			  sync_cout << "info string ignore_move depth=" << ss->ply << "csa=" << move_to_csa(move) << sync_endl;
+			  continue;
+		  }
+	  }
+#endif
 
       if (move == excludedMove)
           continue;

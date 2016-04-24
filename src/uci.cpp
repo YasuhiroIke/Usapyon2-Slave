@@ -40,6 +40,22 @@
 using namespace std;
 
 extern void benchmark(const Position& pos, istream& is);
+vector<Move> vIgnoreMoves;
+
+#ifdef USAPYON2
+void clearIgnoreMoves() {
+	vIgnoreMoves.clear();
+}
+
+bool isIgnoreMove(Move m) {
+	for (auto itr = vIgnoreMoves.begin(); itr != vIgnoreMoves.end(); ++itr) {
+		if (*itr == m) {
+			return true;
+		}
+	}
+	return false;
+}
+#endif
 
 namespace {
 
@@ -57,6 +73,34 @@ namespace {
   Search::StateStackPtr SetupStates;
 
 
+
+#ifdef USAPYON2
+  // ルートで無視する手を設定
+  void ignoreMoves(Position& pos, istringstream& is) {
+	  Move m;
+	  string token;
+	  // Parse move list
+	  while (is >> token && (m = UCI::to_move(pos, token)) != MOVE_NONE) {
+		  // Clearはどうするべきか→position関数で初期化
+		  vIgnoreMoves.push_back(m);
+	  }
+
+	  // 動作確認用
+#if 0
+	  string str;
+	  str = "2b8h+";
+	  m = UCI::to_move(pos, str);
+	  std::cout << "info string " << str << move_to_csa(m) << endl;
+	  vIgnoreMoves.push_back(m);
+	  str = "2b8h";
+	  m = UCI::to_move(pos, str);
+	  std::cout << "info string " << str << move_to_csa(m) << endl;
+	  vIgnoreMoves.push_back(m);
+#endif
+  }
+#endif
+
+
   // position() is called when engine receives the "position" UCI command.
   // The function sets up the position described in the given FEN string ("fen")
   // or the starting position ("startpos") and then makes the moves given in the
@@ -66,7 +110,9 @@ namespace {
 
     Move m;
     string token, fen;
-
+#ifdef USAPYON2
+	clearIgnoreMoves();
+#endif
     is >> token;
 
     if (token == "startpos")
@@ -101,8 +147,8 @@ namespace {
 		pos.do_move(m, SetupStates->top());
 #endif
 	}
-  }
 
+  }
 
   // setoption() is called when engine receives the "setoption" UCI command. The
   // function updates the UCI option ("name") to the given value ("value").
@@ -248,6 +294,9 @@ void UCI::loop(int argc, char* argv[]) {
       else if (token == "isready")    sync_cout << "readyok" << sync_endl;
       else if (token == "go")         go(pos, is);
       else if (token == "position")   position(pos, is);
+#ifdef USAPYON2
+	  else if (token == "ignore_moves")   ignoreMoves(pos, is);
+#endif
       else if (token == "setoption")  setoption(is);
 
       // Additional custom non-UCI commands, useful for debugging
