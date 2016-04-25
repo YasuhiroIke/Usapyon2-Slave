@@ -966,6 +966,10 @@ namespace {
 					continue;
 				}
 			}
+			if ((move & MOVE_CHECK_NARAZU) != 0) {
+				// ÇÌÇ¥ÇÌÇ¥ê∂ê¨Ç≥ÇÍÇΩê¨ÇÁÇ∏ÇÃéËÇîrèúÇ∑ÇÈ
+				continue;
+			}
 #endif
 			if (pos.legal(move))
 			{
@@ -1038,6 +1042,10 @@ moves_loop: // When in check search starts from here
 			  sync_cout << "info string ignore_move depth=" << ss->ply << "csa=" << move_to_csa(move) << sync_endl;
 			  continue;
 		  }
+	  }
+	  if ((move & MOVE_CHECK_NARAZU) != 0) {
+		  // ÇÌÇ¥ÇÌÇ¥ê∂ê¨Ç≥ÇÍÇΩê¨ÇÁÇ∏ÇÃéËÇîrèúÇ∑ÇÈ
+		  continue;
 	  }
 #endif
 
