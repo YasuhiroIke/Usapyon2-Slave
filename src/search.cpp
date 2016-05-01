@@ -72,6 +72,7 @@ namespace TB = Tablebases;
 
 #ifdef USAPYON2
 extern bool isIgnoreMove(Move m);
+extern bool isForceMove(Move m);
 #endif
 
 using std::string;
@@ -965,6 +966,10 @@ namespace {
 				if (isIgnoreMove(move)) {
 					continue;
 				}
+				// 同じくルートなのでforceMoveをチェック
+				if (!isForceMove(move)) {
+					continue;
+				}
 			}
 			if ((move & MOVE_CHECK_NARAZU) != 0) {
 				// わざわざ生成された成らずの手を排除する
@@ -1039,7 +1044,10 @@ moves_loop: // When in check search starts from here
 	  if (ss->ply==1) {
 		  // ルートなのでignoreMovesをチェック
 		  if (isIgnoreMove(move)) {
-			  sync_cout << "info string ignore_move depth=" << ss->ply << "csa=" << move_to_csa(move) << sync_endl;
+			  // sync_cout << "info string ignore_move depth=" << ss->ply << "csa=" << move_to_csa(move) << sync_endl;
+			  continue;
+		  }
+		  if (!isForceMove(move)) {
 			  continue;
 		  }
 	  }
@@ -1061,10 +1069,13 @@ moves_loop: // When in check search starts from here
 
       ss->moveCount = ++moveCount;
 
+#ifndef USAPYON2
+	  // ネットワーク帯域を無駄に使ってしまうので…
       if (RootNode && thisThread == Threads.main() && Time.elapsed() > 3000)
           sync_cout << "info depth " << depth / ONE_PLY
                     << " currmove " << UCI::move(move)
                     << " currmovenumber " << moveCount + thisThread->PVIdx << sync_endl;
+#endif
 
       if (PvNode)
           (ss+1)->pv = nullptr;

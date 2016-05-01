@@ -41,14 +41,32 @@ using namespace std;
 
 extern void benchmark(const Position& pos, istream& is);
 vector<Move> vIgnoreMoves;
+vector<Move> vForceMove;
 
 #ifdef USAPYON2
 void clearIgnoreMoves() {
 	vIgnoreMoves.clear();
 }
 
+void clearForceMove() {
+	vForceMove.clear();
+}
+
 bool isIgnoreMove(Move m) {
 	for (auto itr = vIgnoreMoves.begin(); itr != vIgnoreMoves.end(); ++itr) {
+		if (*itr == m) {
+			return true;
+		}
+	}
+	return false;
+}
+
+bool isForceMove(Move m) {
+	// 強制手がない場合、trueを返す
+	if (vForceMove.size() == 0) {
+		return true;
+	}
+	for (auto itr = vForceMove.begin(); itr != vForceMove.end(); ++itr) {
 		if (*itr == m) {
 			return true;
 		}
@@ -85,8 +103,8 @@ namespace {
 		  vIgnoreMoves.push_back(m);
 	  }
 
-	  // 動作確認用
 #if 0
+	  // 動作確認用
 	  string str;
 	  str = "2b8h+";
 	  m = UCI::to_move(pos, str);
@@ -98,6 +116,26 @@ namespace {
 	  vIgnoreMoves.push_back(m);
 #endif
   }
+
+  // ルートで強制する手を設定
+  void forceMove(Position &pos,istringstream& is) {
+	  Move m;
+	  string token;
+	  // Parse Move
+	  while (is >> token && (m = UCI::to_move(pos, token)) != MOVE_NONE) {
+		  vForceMove.push_back(m);
+	  }
+#if 0
+	  // 動作確認用
+	  string str;
+	  str = "P*7b";
+	  if ((m = UCI::to_move(pos, str)) !=MOVE_NONE) {
+		  std::cout << "info string " << str << move_to_csa(m) << endl;
+		  vForceMove.push_back(m);
+	  }
+#endif
+  }
+
 #endif
 
 
@@ -112,6 +150,7 @@ namespace {
     string token, fen;
 #ifdef USAPYON2
 	clearIgnoreMoves();
+	clearForceMove();
 #endif
     is >> token;
 
@@ -296,6 +335,7 @@ void UCI::loop(int argc, char* argv[]) {
       else if (token == "position")   position(pos, is);
 #ifdef USAPYON2
 	  else if (token == "ignore_moves")   ignoreMoves(pos, is);
+	  else if (token == "force_move")   forceMove(pos, is);
 #endif
       else if (token == "setoption")  setoption(is);
 
@@ -339,10 +379,15 @@ string UCI::value(Value v) {
 
   stringstream ss;
 
+#ifdef USAPYON2
+  // mate等が表示されると、マスター側で一番良い手を探すのに面倒くさい
+  ss << "cp " << v * 100 / DPawn;
+#else
   if (abs(v) < VALUE_MATE - MAX_PLY)
-      ss << "cp " << v * 100 / DPawn;
+	  ss << "cp " << v * 100 / DPawn;
   else
-      ss << "mate " << (v > 0 ? VALUE_MATE - v + 1 : -VALUE_MATE - v) / 2;
+	  ss << "mate " << (v > 0 ? VALUE_MATE - v + 1 : -VALUE_MATE - v) / 2;
+#endif
 
   return ss.str();
 }
