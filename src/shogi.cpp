@@ -241,12 +241,22 @@ void init_application_once()
 	Position::init_evaluate();	// 評価ベクトルの読み込み
 	Position::initMate1ply();
 
-// 定跡ファイルの読み込み
+	// 定跡ファイルの読み込み
+#ifdef USAPYON2
+	if (book[0] == NULL) {
+		book[0] = new Book();
+		book[0]->open(Options["BookFile"]);
+	}
+	if (book[1] == NULL) {
+		book[1] = new Book();
+		book[1]->open(Options["BookFileW"]);
+	}
+#else
 	if (book == NULL) {
 		book = new Book();
 		book->open(Options["BookFile"]);
 	}
-
+#endif
 	int from;
 	int to;
 	int i;

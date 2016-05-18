@@ -66,8 +66,8 @@ void init(OptionsMap& o) {
 
   o["Write_Debug_Log"]       << Option(false, on_logger);
   o["Contempt"]              << Option(0, -100, 100);
-  o["Threads"]               << Option(8, 1, 128, on_threads);
-  o["Hash"]                  << Option(4096, 1, MaxHashMB, on_hash_size);
+  o["Threads"]               << Option(1, 1, 128, on_threads);
+  o["Hash"]                  << Option(256, 1, MaxHashMB, on_hash_size);
   o["Clear_Hash"]            << Option(on_clear_hash);
   o["Ponder"]                << Option(true);
   o["MultiPV"]               << Option(1, 1, 500);

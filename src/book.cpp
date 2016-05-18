@@ -30,7 +30,11 @@
 #include "movegen.h"
 #include "position.h"
 
+#ifdef USAPYON2
+Book *book[2];
+#else
 Book *book;
+#endif
 
 Book::Book() : joseki(), prng(now())
 {

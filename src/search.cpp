@@ -305,13 +305,29 @@ void MainThread::search() {
   }
   else if (Options["OwnBook"]) {
 	bool bBestBookMove = !Options["RandomBookSelect"];
+#ifdef USAPYON2
+	Move bookMove = book[us] ? book[us]->get_move(rootPos, bBestBookMove) : MOVE_NONE;
+#else
 	Move bookMove = book ? book->get_move(rootPos, bBestBookMove) : MOVE_NONE;
+#endif
 	if (bookMove != MOVE_NONE){
 		SentBestmove = true;
 		sync_cout << "bestmove " << move_to_uci(bookMove);
 	}
   }
 #endif
+#ifdef USAPYON2
+  // “Š—¹‚·‚é‚×‚«Žž‚É‚Ç‚±‚©‚©‚çillegal move‚ðŽ‚Á‚Ä—ˆ‚éŒ»Û‚Ì‘Îô
+  // ‚Ü‚¾‡‚Á‚Ä‚¢‚é‚©‚Ç‚¤‚©Ž©M‚È‚µcB
+  if (!SentBestmove) {
+	  if (rootMoves.empty()) {
+		  sync_cout << "info depth 0 score " << UCI::value(-VALUE_MATE) << sync_endl;
+		  sync_cout << "bestmove resign";
+		  SentBestmove = true;
+	  }
+  }
+#endif // USAPYON2
+
 #ifdef NANOHA
   if (!SentBestmove){
 #endif

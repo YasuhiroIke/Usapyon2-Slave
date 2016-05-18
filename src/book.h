@@ -80,6 +80,10 @@ public:
 	Move get_move(Position& pos, bool findBestMove);
 };
 
+#ifdef USAPYON2
+extern Book *book[2];
+#else
 extern Book *book;
+#endif
 
 #endif // !defined(BOOK_H_INCLUDED)
